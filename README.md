@@ -59,8 +59,6 @@ Recommended structure:
 │   └── CkringPso_1.0.ipynb
 ├── data/
 │   └── demo_terrain.xlsx
-├── outputs/
-│   └── coordinates_3d.xlsx
 ├── requirements.txt
 ├── LICENSE
 └── README.md

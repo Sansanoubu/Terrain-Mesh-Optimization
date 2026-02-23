@@ -1,11 +1,9 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import pywt
-import pyKriging
-import scipy
-from matplotlib.path import Path
-from scipy.integrate import nquad
-import csv
-import time
-import math
+numpy
+pandas
+scipy
+matplotlib
+PyWavelets
+openpyxl
+pyKriging
+jupyterlab
+ipykernel

@@ -2,9 +2,7 @@
 Research code (Jupyter Notebook) for a hybrid **geometry-aware PSO + ODT-style relaxation** terrain meshing workflow. The optimized mesh is intended for simulation-driven pipelines (e.g., **CFD / FEM** preprocessing over complex terrain), with a geometry-aware density that prioritizes terrain-feature regions.
 
 
-下面是一份**投稿级、可复现导向**的 `README.md` 成品，你直接复制到仓库根目录的 `README.md` 就行（把尖括号里的占位符换成你的信息即可）。我按 EMS 的要求把 **demo 数据、原始数据不可共享说明、运行步骤、输入输出、关键参数、引用与许可** 都写全了。
 
-````md
 # Hybrid Geometry-Aware PSO–ODT for Terrain Meshing in Complex Terrain
 
 Open-source research code for a simulation-driven terrain meshing workflow based on a hybrid

@@ -1,59 +1,23 @@
 # Terrain-Mesh-Optimization
-Research code (Jupyter Notebook) for a hybrid **geometry-aware PSO + ODT-style relaxation** terrain meshing workflow. The optimized mesh is intended for simulation-driven pipelines (e.g., **CFD / FEM** preprocessing over complex terrain), with a geometry-aware density that prioritizes terrain-feature regions.
 
+Research code for the manuscript:
 
+**Hybrid Geometry-Aware PSO–ODT for Terrain Meshing in Complex Terrain**  
+Submitted to *Environmental Modelling and Software*.
 
-# Hybrid Geometry-Aware PSO–ODT for Terrain Meshing in Complex Terrain
+This repository provides a reproducible Jupyter Notebook implementation of a geometry-aware terrain mesh optimization workflow. The method combines Particle Swarm Optimization (PSO) with an Optimal Delaunay Triangulation (ODT)-style mesh-quality objective. The optimized terrain mesh is intended for simulation-driven workflows, such as CFD or FEM preprocessing over complex terrain.
 
-Open-source research code for a simulation-driven terrain meshing workflow based on a hybrid
-geometry-aware PSO and ODT-style mesh relaxation. The optimized mesh is intended for
-CFD and FEM preprocessing over complex terrain.
+## Main features
 
-This repository accompanies the manuscript:
-Hybrid Geometry-Aware PSO–ODT for Terrain Meshing in Complex Terrain
-submitted to Environmental Modelling and Software.
+- Geometry-aware terrain-density construction for terrain-feature preservation.
+- PSO-driven global search combined with ODT-style local mesh regularization.
+- Projection–optimization–reconstruction workflow for terrain mesh generation.
+- Kriging-based reconstruction from optimized 2D points to 3D terrain.
+- Demo terrain dataset included for reproducibility.
 
-## Features
-- Geometry-aware objective and density construction for terrain-feature preservation
-- PSO-driven global search with ODT-style local mesh regularization
-- End-to-end reproducible workflow in a single Jupyter Notebook
-- Demo terrain dataset included for reviewer reproducibility
+## Repository structure
 
----
-
-## Quick start
-
-### 1. Create environment
-Python 3.10 or newer is recommended.
-
-```bash
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
-
-pip install -U pip
-pip install -r requirements.txt
-````
-
-### 2. Run the notebook
-
-```bash
-jupyter lab
-```
-
-Open and run all cells:
-
-* notebooks/CkringPso_1.0.ipynb
-
----
-
-## Repository layout
-
-Recommended structure:
-
-```
+```text
 .
 ├── notebooks/
 │   └── CkringPso_1.0.ipynb
@@ -64,138 +28,223 @@ Recommended structure:
 └── README.md
 ```
 
----
+## Reproduction workflow
 
-## Input data
+The original terrain dataset used in the manuscript cannot be publicly shared due to data access and redistribution restrictions. To support reproducibility, a demo terrain dataset is provided in:
 
-### Demo data
+```text
+data/demo_terrain.xlsx
+```
 
-A demo terrain raster is provided at:
+The main workflow can be reproduced as follows.
 
-* data/demo_terrain.xlsx
+### 1. Create the Python environment
 
-The notebook reads a regular grid raster from Excel, for example:
+Python 3.10 or newer is recommended.
+
+```bash
+python -m venv .venv
+```
+
+Activate the environment.
+
+For Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+For macOS or Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Install the required packages:
+
+```bash
+pip install -U pip
+pip install -r requirements.txt
+```
+
+### 2. Open the main notebook
+
+Start Jupyter Lab:
+
+```bash
+jupyter lab
+```
+
+Open the notebook:
+
+```text
+notebooks/CkringPso_1.0.ipynb
+```
+
+Run the notebook cells in order. The notebook contains the essential steps of the workflow:
+
+1. terrain data loading;
+2. 3D-to-2D projection;
+3. terrain-density function construction;
+4. PSO–ODT mesh optimization;
+5. Kriging-based 3D reconstruction;
+6. mesh-quality evaluation;
+7. result visualization and export.
+
+### 3. Input data setting
+
+The demo file is read in the data-loading cell of the notebook. The default input path is:
 
 ```python
 file_path = "data/demo_terrain.xlsx"
+```
+
+The demo file is an Excel-based regular elevation grid. By default, the notebook reads the elevation values using:
+
+```python
 df = pd.read_excel(file_path, skiprows=5)
 Z = df.to_numpy()
 ```
 
-Notes:
+If your Excel layout is different, update the `skiprows` value in the data-loading cell.
 
-* skiprows=5 is assumed by default. Adjust it if your Excel layout differs.
-* The raster is assumed to be a regular grid of numeric elevations.
+### 4. Using a new terrain dataset
 
-### Using your own terrain
+To apply the workflow to another terrain case, replace the demo input file with a user-provided elevation grid and update the input path in the notebook:
 
-Replace file_path with your own raster grid in the same format.
-If your DEM is GeoTIFF, ASC, or CSV, convert it to a numeric grid or adapt the loader cell.
+```python
+file_path = "data/your_terrain_file.xlsx"
+```
 
-Grid spacing:
+The input file should contain a regular grid of numeric elevation values in the same format as the demo dataset.
 
-* The notebook currently maps grid indices to physical coordinates using a fixed spacing factor.
-* If your terrain resolution differs, update the spacing factor used to build x and y coordinates.
+If the original terrain data are stored as GeoTIFF, ASC, CSV, or another DEM format, users should either convert the data into the Excel grid format used by the demo file or modify the data-loading cell accordingly.
 
----
+The notebook maps grid indices to physical coordinates using a spacing factor. If the terrain resolution differs from the demo case, update the spacing factor in the coordinate-generation cell.
+
+## Key parameters
+
+The main parameters are defined in the parameter cells near the beginning of:
+
+```text
+notebooks/CkringPso_1.0.ipynb
+```
+
+Important parameters include:
+
+- `n_particles`: number of PSO particles;
+- `n_iterations`: maximum number of optimization iterations;
+- PSO coefficients controlling individual, global, and geometry-guided search terms;
+- grid spacing used to convert raster indices into physical coordinates;
+- mesh-quality evaluation settings.
+
+For a quick reviewer-friendly test, the following reduced settings can be used:
+
+```python
+n_particles = 10
+n_iterations = 30
+```
+
+For repeatable results, set a fixed random seed before optimization:
+
+```python
+np.random.seed(0)
+```
+
+The notebook may use a subset of the terrain grid for quick testing. To run the full terrain case, disable the subset operation in the data-preprocessing cell.
 
 ## Outputs
 
 The notebook produces:
 
-* Mesh and diagnostic plots inside the notebook
-* Optimized 3D node coordinates exported to Excel
+- terrain mesh visualization;
+- optimization diagnostic plots;
+- mesh-quality evaluation results;
+- reconstructed 3D terrain points;
+- exported optimized node coordinates.
 
-Default export file:
+The default output file is:
 
-* outputs/coordinates_3d.xlsx
+```text
+outputs/coordinates_3d.xlsx
+```
 
-The exported table contains x, y, z for each optimized node.
-If triangle connectivity is needed for downstream workflows, you can export it from the Delaunay
-triangulation object, for example tri.simplices.
+The exported table contains the optimized node coordinates:
 
----
+```text
+x, y, z
+```
 
-## Key parameters for reproducibility
+If triangle connectivity is required for downstream workflows, it can be exported from the Delaunay triangulation object, for example:
 
-The runtime depends on terrain size and optimization settings.
-
-Common parameters:
-
-* n_particles: number of PSO particles
-* n_iterations: number of optimization iterations
-
-Reviewer friendly quick run:
-
-* n_particles = 10
-* n_iterations = 30
-
-If random initialization is used, set a fixed seed for repeatability:
-
-* np.random.seed(0)
-
-The notebook may include a raster subset for quick testing. To run the full terrain, disable the subset.
-
----
+```python
+tri.simplices
+```
 
 ## Data availability
 
-* Included: a public demo terrain dataset in data/1test.xlsx for full reproducibility.
-* Not included: the original terrain dataset used in the manuscript cannot be shared due to data access
-  restrictions and lack of redistribution permission.
-* Reproducibility path: users can rerun the workflow on their own terrain by providing a raster grid in the
-  same input format and updating file_path.
+Included in this repository:
 
-This enables transparent verification of the method while respecting data sharing constraints.
+```text
+data/demo_terrain.xlsx
+```
 
----
+This demo dataset can be used to reproduce the main computational workflow.
+
+Not included:
+
+The original terrain dataset used in the manuscript cannot be publicly shared due to data access and redistribution restrictions.
+
+Reproducibility path:
+
+Users can reproduce the workflow using the provided demo dataset or apply the method to their own terrain by replacing the input elevation grid and updating the input path in the notebook.
 
 ## Dependencies
 
-Core packages used:
+Core Python packages include:
 
-* numpy
-* pandas
-* scipy
-* matplotlib
-* pywavelets
-* openpyxl
-* pyKriging
+- `numpy`
+- `pandas`
+- `scipy`
+- `matplotlib`
+- `openpyxl`
+- `pyKriging`
+- `PyWavelets`
 
+All required packages are listed in:
 
+```text
+requirements.txt
+```
 
 ## Citation
 
 If you use this code, please cite:
 
-Hybrid Geometry-Aware PSO–ODT for Terrain Meshing in Complex Terrain
-Environmental Modelling and Software, submitted.
+```text
+Xu J. Hybrid Geometry-Aware PSO–ODT for Terrain Meshing in Complex Terrain. Environmental Modelling and Software, submitted.
+```
 
 BibTeX:
 
 ```bibtex
-@article{
+@article{xu2026terrainmesh,
   title   = {Hybrid Geometry-Aware PSO--ODT for Terrain Meshing in Complex Terrain},
-  author  = {Jianxin Xu},
-  journal = {Environmental Modelling \& Software},
+  author  = {Xu, Jianxin},
+  journal = {Environmental Modelling and Software},
   year    = {2026},
-  note    = {submitted}
+  note    = {Submitted}
 }
 ```
 
----
-
 ## License
 
-Apache-2.0
-
----
+This repository is released under the Apache-2.0 License.
 
 ## Contact
 
-For questions and reproducibility issues:
+For questions related to reproducibility, please contact:
 
-* Corresponding author: sansanoubu@gmail.com
-
+```text
+sansanoubu@gmail.com
 ```
-
